@@ -86,4 +86,16 @@ class CourseControllerIntgTest {
 
         assertThat(updatedCourse!!.name).isEqualTo(updatedCourseDTO.name)
     }
+
+    @Test
+    fun deleteCourse() {
+        val course = Course(null, "Build Reactive Microservices using Spring WebFlux/SpringBoot", "Development")
+        courseRepository.save(course)
+
+        webTestClient
+            .delete()
+            .uri("/v1/courses/{courseId}", course.id)
+            .exchange()
+            .expectStatus().isNoContent
+    }
 }
