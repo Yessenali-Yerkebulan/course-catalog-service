@@ -1,6 +1,7 @@
 package com.kotlinspring.controller
 
 import com.kotlinspring.dto.CourseDTO
+import com.kotlinspring.entity.Course
 import com.kotlinspring.repository.CourseRepository
 import com.kotlinspring.service.CourseService
 import com.kotlinspring.util.courseEntityList
@@ -60,5 +61,29 @@ class CourseControllerIntgTest {
 
         assertThat(courseDTOs).isNotEmpty
         assertThat(courseDTOs!!.size).isEqualTo(3)
+    }
+
+    @Test
+    fun updateCourse() {
+        val course =     Course(null,
+            "Build Reactive Microservices using Spring WebFlux/SpringBoot", "Development"
+        )
+        courseRepository.save(course)
+
+        val updatedCourseDTO = CourseDTO(null,
+            "Build Reactive Microservices using Spring WebFlux/SpringBoot updated", "Development"
+        )
+
+        val updatedCourse = webTestClient
+            .put()
+            .uri("/v1/courses/{courseId}", course.id)
+            .bodyValue(updatedCourseDTO)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(CourseDTO::class.java)
+            .returnResult()
+            .responseBody
+
+        assertThat(updatedCourse!!.name).isEqualTo(updatedCourseDTO.name)
     }
 }
