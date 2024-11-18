@@ -6,6 +6,8 @@ import com.kotlinspring.service.CourseService
 import com.kotlinspring.util.courseDTO
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
+import io.mockk.just
+import io.mockk.runs
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -87,5 +89,17 @@ class CourseControllerUnitTest {
             .responseBody
 
         assertThat(updatedCourse!!.name).isEqualTo(updatedCourseDTO.name)
+    }
+
+    @Test
+    fun deleteCourse() {
+        every {
+            courseServiceMockk.deleteCourse(any())
+        } just runs
+        webTestClient
+            .delete()
+            .uri("/v1/courses/{courseId}", 100)
+            .exchange()
+            .expectStatus().isNoContent
     }
 }
