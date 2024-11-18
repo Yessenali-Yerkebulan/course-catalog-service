@@ -13,4 +13,7 @@ class CourseController(val courseService: CourseService) {
     fun addCourse(@RequestBody courseDTO: CourseDTO): CourseDTO {
         return courseService.addCourse(courseDTO)
     }
+
+    @GetMapping
+    fun retrieveAlLCourses() : List<CourseDTO> = courseService.retrieveAllCourses()
 }
