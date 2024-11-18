@@ -1,6 +1,7 @@
 package com.kotlinspring.controller
 
 import com.kotlinspring.dto.CourseDTO
+import com.kotlinspring.entity.Course
 import com.kotlinspring.service.CourseService
 import com.kotlinspring.util.courseDTO
 import com.ninjasquad.springmockk.MockkBean
@@ -63,5 +64,28 @@ class CourseControllerUnitTest {
 
         assertThat(courseDTOs).isNotEmpty
         assertThat(courseDTOs!!.size).isEqualTo(2)
+    }
+
+    @Test
+    fun updateCourse() {
+        every {
+            courseServiceMockk.updateCourse(any(), any())
+        } returns courseDTO(id=100, name="Build Reactive Microservices using Spring WebFlux/SpringBoot updated")
+
+        val updatedCourseDTO = CourseDTO(null,
+            "Build Reactive Microservices using Spring WebFlux/SpringBoot updated", "Development"
+        )
+
+        val updatedCourse = webTestClient
+            .put()
+            .uri("/v1/courses/{courseId}", 100)
+            .bodyValue(updatedCourseDTO)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody(CourseDTO::class.java)
+            .returnResult()
+            .responseBody
+
+        assertThat(updatedCourse!!.name).isEqualTo(updatedCourseDTO.name)
     }
 }
