@@ -46,6 +46,22 @@ class CourseControllerUnitTest {
     }
 
     @Test
+    fun addCourse_validation() {
+        val courseDto = CourseDTO(null, "Build Restful APIs using SpringBoot and Kotlin", "")
+
+        every {
+            courseServiceMockk.addCourse(any())
+        } returns courseDTO(id = 1)
+
+        val savedCourseDTO = webTestClient
+            .post()
+            .uri("/v1/courses")
+            .bodyValue(courseDto)
+            .exchange()
+            .expectStatus().isBadRequest
+    }
+
+    @Test
     fun retrieveAllCourses() {
         every {
             courseServiceMockk.retrieveAllCourses()
