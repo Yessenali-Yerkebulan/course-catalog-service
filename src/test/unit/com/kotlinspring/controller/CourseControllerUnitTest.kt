@@ -41,4 +41,27 @@ class CourseControllerUnitTest {
 
         assertThat(savedCourseDTO!!.id).isNotNull
     }
+
+    @Test
+    fun retrieveAllCourses() {
+        every {
+            courseServiceMockk.retrieveAllCourses()
+        }.returnsMany(
+            listOf(courseDTO(id =1),
+                courseDTO(id = 2,
+                    name = "Build Restful APIs using SpringBoot and Kotlin"))
+        )
+
+        val courseDTOs = webTestClient
+            .get()
+            .uri("/v1/courses")
+            .exchange()
+            .expectStatus().isOk
+            .expectBodyList(CourseDTO::class.java)
+            .returnResult()
+            .responseBody
+
+        assertThat(courseDTOs).isNotEmpty
+        assertThat(courseDTOs!!.size).isEqualTo(2)
+    }
 }
