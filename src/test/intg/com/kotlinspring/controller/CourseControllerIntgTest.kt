@@ -3,8 +3,10 @@ package com.kotlinspring.controller
 import com.kotlinspring.dto.CourseDTO
 import com.kotlinspring.entity.Course
 import com.kotlinspring.repository.CourseRepository
+import com.kotlinspring.repository.InstructorRepository
 import com.kotlinspring.service.CourseService
 import com.kotlinspring.util.courseEntityList
+import com.kotlinspring.util.instructorEntity
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,16 +27,24 @@ class CourseControllerIntgTest {
     @Autowired
     lateinit var courseRepository : CourseRepository
 
+    @Autowired
+    lateinit var instructorRepository: InstructorRepository
+
     @BeforeEach
     fun setUp() {
         courseRepository.deleteAll()
-        val courses = courseEntityList()
+        instructorRepository.deleteAll()
+        val instructor = instructorEntity()
+        instructorRepository.save(instructor)
+        val courses = courseEntityList(instructor)
         courseRepository.saveAll(courses)
     }
 
     @Test
     fun addCourse() {
-        val courseDto = CourseDTO(null, "Build Restful APIs using SpringBoot and Kotlin", "Test user")
+        val instructor = instructorRepository.findAll().first()
+
+        val courseDto = CourseDTO(null, "Build Restful APIs using SpringBoot and Kotlin", "DEVELOPMENT", instructor.id)
 
         val savedCourseDTO = webTestClient
             .post()
@@ -85,13 +95,15 @@ class CourseControllerIntgTest {
 
     @Test
     fun updateCourse() {
+        val instructor = instructorRepository.findAll().first()
+
         val course =     Course(null,
-            "Build Reactive Microservices using Spring WebFlux/SpringBoot", "Development"
+            "Build Reactive Microservices using Spring WebFlux/SpringBoot", "Development", instructor
         )
         courseRepository.save(course)
 
         val updatedCourseDTO = CourseDTO(null,
-            "Build Reactive Microservices using Spring WebFlux/SpringBoot updated", "Development"
+            "Build Reactive Microservices using Spring WebFlux/SpringBoot updated", "Development", course.instructor!!.id
         )
 
         val updatedCourse = webTestClient
@@ -109,7 +121,9 @@ class CourseControllerIntgTest {
 
     @Test
     fun deleteCourse() {
-        val course = Course(null, "Build Reactive Microservices using Spring WebFlux/SpringBoot", "Development")
+        val instructor = instructorRepository.findAll().first()
+
+        val course = Course(null, "Build Reactive Microservices using Spring WebFlux/SpringBoot", "Development", instructor)
         courseRepository.save(course)
 
         webTestClient
