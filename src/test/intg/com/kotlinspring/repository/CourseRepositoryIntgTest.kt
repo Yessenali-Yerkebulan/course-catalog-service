@@ -23,7 +23,7 @@ class CourseRepositoryIntgTest {
 
     @Test
     fun findByNameContaining() {
-        val courses = courseRepository.findByNameContaining("SpringBoot")
+        val courses = courseRepository.findCoursesByName("SpringBoot")
 
         assertThat(courses).isNotEmpty
         assertThat(courses.size).isEqualTo(2)
