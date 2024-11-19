@@ -67,6 +67,28 @@ class CourseControllerUnitTest {
     }
 
     @Test
+    fun addCourse_runtimeException() {
+        val courseDto = CourseDTO(null, "Build Restful APIs using SpringBoot and Kotlin", "asdf")
+
+        val errorMessage = "Unexpected error happened"
+        every {
+            courseServiceMockk.addCourse(any())
+        } throws RuntimeException(errorMessage)
+
+        val response = webTestClient
+            .post()
+            .uri("/v1/courses")
+            .bodyValue(courseDto)
+            .exchange()
+            .expectStatus().is5xxServerError
+            .expectBody(String::class.java)
+            .returnResult()
+            .responseBody
+
+        assertThat(response).isEqualTo(errorMessage)
+    }
+
+    @Test
     fun retrieveAllCourses() {
         every {
             courseServiceMockk.retrieveAllCourses()

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 import java.net.http.HttpHeaders
@@ -30,5 +31,11 @@ class GlobalErrorHandler : ResponseEntityExceptionHandler() {
         logger.info("errors : $errors")
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors.joinToString(", ") { it })
+    }
+
+    @ExceptionHandler(Exception::class)
+    fun handleAllExceptions(ex: Exception, request: WebRequest): ResponseEntity<Any> {
+        logger.error("Exception : ${ex.message}", ex)
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.message)
     }
 }
